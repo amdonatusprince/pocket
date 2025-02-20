@@ -1,0 +1,61 @@
+{
+  "name": "pocket-finance",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write .",
+    "prepare": "husky install",
+    "test": "node --loader ts-node/esm ./src/lib/privy/testBalance.ts"
+  },
+  "dependencies": {
+    "@elizaos/adapter-supabase": "^0.25.6-alpha.1",
+    "@elizaos/client-auto": "^0.25.6-alpha.1",
+    "@elizaos/client-direct": "0.25.6-alpha.1",
+    "@elizaos/client-telegram": "^0.25.6-alpha.1",
+    "@elizaos/client-twitter": "^0.25.6-alpha.1",
+    "@elizaos/core": "^0.25.6-alpha.1",
+    "@solana/web3.js": "^1.98.0",
+    "@tanstack/react-query": "^5.66.0",
+    "next": "15.1.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hot-toast": "^2.5.1",
+    "react-markdown": "^9.0.3",
+    "rehype-highlight": "^7.0.2",
+    "remark-gfm": "^4.0.1",
+    "ts-node": "^10.9.2",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@privy-io/react-auth": "^2.4.2",
+    "@privy-io/wagmi-connector": "^0.1.13",
+    "@types/node": "^22.13.4",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/yargs": "^17.0.33",
+    "@typescript-eslint/eslint-plugin": "^8.23.0",
+    "@typescript-eslint/parser": "^8.23.0",
+    "eslint": "^9",
+    "eslint-config-next": "15.1.6",
+    "eslint-config-prettier": "^10.0.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "lucide-react": "^0.475.0",
+    "postcss": "^8",
+    "prettier": "^3.4.2",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.7.3",
+    "viem": "^2.23.3",
+    "wagmi": "^2.14.11"
+  },
+  "type": "module",
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
+}
