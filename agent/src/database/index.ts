@@ -1,40 +1,16 @@
-import { PostgresDatabaseAdapter } from "@elizaos/adapter-postgres";
-import { SqliteDatabaseAdapter } from "@elizaos/adapter-sqlite";
-import Database from "better-sqlite3";
-import path from "path";
+// MongoDB
+import { MongoDBDatabaseAdapter } from '@elizaos/adapter-mongodb';
+import { MongoClient } from 'mongodb';
 
-export function initializeDatabase(dataDir: string) {
-  if (process.env.POSTGRES_URL) {
-    const db = new PostgresDatabaseAdapter({
-      connectionString: process.env.POSTGRES_URL,
-    });
+
+export function initializeDatabase() {
+  if (process.env.MONGODB_URI) {
+    const client = new MongoClient(process.env.MONGODB_URI);
+    const db = new MongoDBDatabaseAdapter(
+        client,
+        process.env.MONGODB_DB
+    );
     return db;
-  } else {
-    const filePath =
-      process.env.SQLITE_FILE ?? path.resolve(dataDir, "db.sqlite");
-    // ":memory:";
-    const db = new SqliteDatabaseAdapter(new Database(filePath));
-    return db;
-  }
 }
-
-
-// import { PostgresDatabaseAdapter } from "@elizaos/adapter-postgres";
-// import { SqliteDatabaseAdapter } from "@elizaos/adapter-sqlite";
-// import { SupabaseDatabaseAdapter } from "@elizaos/adapter-supabase";
-// import Database from "better-sqlite3";
-
-// import path from "path";
-
-// export function initializeDatabase(dataDir: string) {
-//   if (process.env.SUPABASE_URL && process.env.SUPABASE_KEY) {
-//     const db = new SupabaseDatabaseAdapter(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
-//     return db;
-//   } else {
-//     const filePath =
-//       process.env.SQLITE_FILE ?? path.resolve(dataDir, "db.sqlite");
-//     // ":memory:";
-//     const db = new SqliteDatabaseAdapter(new Database(filePath));
-//     return db;
-//   }
-// }
+throw new Error("No database setup found");
+}

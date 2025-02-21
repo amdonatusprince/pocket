@@ -11,12 +11,18 @@ importers:
 
   .:
     dependencies:
+      '@elizaos/adapter-mongodb':
+        specifier: 0.25.6-alpha.1
+        version: 0.25.6-alpha.1(@google-cloud/vertexai@1.9.3)(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(@langchain/groq@0.1.3(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(cheerio@1.0.0)(react@18.3.1)(socks@2.8.4)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)
       '@elizaos/adapter-postgres':
         specifier: 0.1.9
         version: 0.1.9(@google-cloud/vertexai@1.9.3)(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(@langchain/groq@0.1.3(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(cheerio@1.0.0)(react@18.3.1)(sswr@2.1.0(svelte@5.20.2))(svelte@5.20.2)(vue@3.5.13(typescript@5.6.3))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@elizaos/adapter-sqlite':
         specifier: 0.1.9
         version: 0.1.9(@google-cloud/vertexai@1.9.3)(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(@langchain/groq@0.1.3(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(cheerio@1.0.0)(react@18.3.1)(sswr@2.1.0(svelte@5.20.2))(svelte@5.20.2)(vue@3.5.13(typescript@5.6.3))(whatwg-url@14.1.1)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@elizaos/adapter-supabase':
+        specifier: 0.25.6-alpha.1
+        version: 0.25.6-alpha.1(@google-cloud/vertexai@1.9.3)(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(@langchain/groq@0.1.3(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(bufferutil@4.0.9)(cheerio@1.0.0)(react@18.3.1)(utf-8-validate@5.0.10)(whatwg-url@14.1.1)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)
       '@elizaos/client-auto':
         specifier: 0.1.9
         version: 0.1.9(@google-cloud/vertexai@1.9.3)(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(@langchain/groq@0.1.3(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(cheerio@1.0.0)(react@18.3.1)(sswr@2.1.0(svelte@5.20.2))(svelte@5.20.2)(vue@3.5.13(typescript@5.6.3))(whatwg-url@14.1.1)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
@@ -71,6 +77,9 @@ importers:
       fs:
         specifier: 0.0.1-security
         version: 0.0.1-security
+      mongodb:
+        specifier: ^6.13.1
+        version: 6.13.1(socks@2.8.4)
       net:
         specifier: 1.0.2
         version: 1.0.2
@@ -1709,11 +1718,20 @@ packages:
     peerDependencies:
       '@noble/ciphers': ^1.0.0
 
+  '@elizaos/adapter-mongodb@0.25.6-alpha.1':
+    resolution: {integrity: sha512-EY+dK/t+lWaLq0SfiyCQFPzHUVM0sMafWZmAFKF/lB/fqQL4QsKbD+qzsAoYYP9ZZD1vbdCJeIBsFTbKnhVwIg==}
+    engines: {node: '>=16.0.0'}
+
   '@elizaos/adapter-postgres@0.1.9':
     resolution: {integrity: sha512-vkrxoL/7XJxSujJ8qWqVasIiuGzHvpJyo3Kk1kyAZxc3guExiPSYoGDki0ld1b+1LMPmU1qGS0GfFps4XXyMUQ==}
 
   '@elizaos/adapter-sqlite@0.1.9':
     resolution: {integrity: sha512-r76heXuu3fcDYXyqxsSmAQ/X2KOeoZEY4BM/SPLI9aBd6xJewPC0ig6nRvAvoHBDaKgpBf3cwUvvz/MADCirCg==}
+    peerDependencies:
+      whatwg-url: 7.1.0
+
+  '@elizaos/adapter-supabase@0.25.6-alpha.1':
+    resolution: {integrity: sha512-2cX0XC0wx7Ul5O2jH5cNCnP2YtPLus9qZi6SR5aRV7c+6MEBUP39Oe814d3wGkWY51N9kVr4A+GQ3o3JOjhMIw==}
     peerDependencies:
       whatwg-url: 7.1.0
 
@@ -3092,6 +3110,9 @@ packages:
   '@modelcontextprotocol/sdk@1.5.0':
     resolution: {integrity: sha512-IJ+5iVVs8FCumIHxWqpwgkwOzyhtHVKy45s6Ug7Dv0MfRpaYisH8QQ87rIWeWdOzlk8sfhitZ7HCyQZk7d6b8w==}
     engines: {node: '>=18'}
+
+  '@mongodb-js/saslprep@1.2.0':
+    resolution: {integrity: sha512-+ywrb0AqkfaYuhHs6LxKWgqbh3I72EpEgESCw37o+9qPx9WTCkgDm2B+eMrwehGtHBWHFU4GXvnSCNiFhhausg==}
 
   '@motionone/animation@10.18.0':
     resolution: {integrity: sha512-9z2p5GFGCm0gBsZbi8rVMOAJCtw1WqBTIPw3ozk06gDvZInBPIsQcHgYogEJ4yuHJ+akuW8g1SEIOpTOvYs8hw==}
@@ -4962,6 +4983,28 @@ packages:
     peerDependencies:
       '@mysten/sui': 1.12.0
 
+  '@supabase/auth-js@2.65.1':
+    resolution: {integrity: sha512-IA7i2Xq2SWNCNMKxwmPlHafBQda0qtnFr8QnyyBr+KaSxoXXqEzFCnQ1dGTy6bsZjVBgXu++o3qrDypTspaAPw==}
+
+  '@supabase/functions-js@2.4.3':
+    resolution: {integrity: sha512-sOLXy+mWRyu4LLv1onYydq+10mNRQ4rzqQxNhbrKLTLTcdcmS9hbWif0bGz/NavmiQfPs4ZcmQJp4WqOXlR4AQ==}
+
+  '@supabase/node-fetch@2.6.15':
+    resolution: {integrity: sha512-1ibVeYUacxWYi9i0cf5efil6adJ9WRyZBLivgjs+AUpewx1F3xPi7gLgaASI2SmIQxPoCEjAsLAzKPgMJVgOUQ==}
+    engines: {node: 4.x || >=6.0.0}
+
+  '@supabase/postgrest-js@1.16.3':
+    resolution: {integrity: sha512-HI6dsbW68AKlOPofUjDTaosiDBCtW4XAm0D18pPwxoW3zKOE2Ru13Z69Wuys9fd6iTpfDViNco5sgrtnP0666A==}
+
+  '@supabase/realtime-js@2.10.9':
+    resolution: {integrity: sha512-0AjN65VDNIScZzrrPaVvlND4vbgVS+j9Wcy3zf7e+l9JY4IwCTahFenPLcKy9bkr7KY0wfB7MkipZPKxMaDnjw==}
+
+  '@supabase/storage-js@2.7.1':
+    resolution: {integrity: sha512-asYHcyDR1fKqrMpytAS1zjyEfvxuOIp1CIXX7ji4lHHcJKqyk+sLl/Vxgm4sN6u8zvuUtae9e4kDxQP2qrwWBA==}
+
+  '@supabase/supabase-js@2.46.2':
+    resolution: {integrity: sha512-5FEzYMZhfIZrMWEqo5/dQincvrhM+DeMWH3/okeZrkBBW1AJxblOQhnhF4/dfNYK25oZ1O8dAnnxZ9gQqdr40w==}
+
   '@supercharge/promise-pool@3.2.0':
     resolution: {integrity: sha512-pj0cAALblTZBPtMltWOlZTQSLT07jIaFNeM8TWoJD1cQMgDB9mcMlVMoetiB35OzNJpqQ2b+QEtwiR9f20mADg==}
     engines: {node: '>=8'}
@@ -5341,6 +5384,9 @@ packages:
   '@types/pg@8.11.10':
     resolution: {integrity: sha512-LczQUW4dbOQzsH2RQ5qoeJ6qJPdrcM/DcMLoqWQkMLMsq83J5lAX3LXjdkWdpscFy67JSOWDnh7Ny/sPFykmkg==}
 
+  '@types/phoenix@1.6.6':
+    resolution: {integrity: sha512-PIzZZlEppgrpoT2QgbnDU+MMzuR6BbCjllj0bM70lWoejMeNJAxCchxnv7J3XFkI8MpygtRpzXrIlmWUBclP5A==}
+
   '@types/promise-retry@1.1.6':
     resolution: {integrity: sha512-EC1+OMXV0PZb0pf+cmyxc43MEP2CDumZe4AfuxWboxxEixztIebknpJPZAX5XlodGF1OY+C1E/RAeNGzxf+bJA==}
 
@@ -5392,8 +5438,14 @@ packages:
   '@types/webextension-polyfill@0.10.7':
     resolution: {integrity: sha512-10ql7A0qzBmFB+F+qAke/nP1PIonS0TXZAOMVOxEUsm+lGSW6uwVcISFNa0I4Oyj0884TZVWGGMIWeXOVSNFHw==}
 
+  '@types/webidl-conversions@7.0.3':
+    resolution: {integrity: sha512-CiJJvcRtIgzadHCYXw7dqEnMNRjhGZlYK05Mj9OyktqV8uVT8fD2BFOB7S1uwBE3Kj2Z+4UyPmFw/Ixgw/LAlA==}
+
   '@types/webrtc@0.0.37':
     resolution: {integrity: sha512-JGAJC/ZZDhcrrmepU4sPLQLIOIAgs5oIK+Ieq90K8fdaNMhfdfqmYatJdgif1NDQtvrSlTOGJDUYHIDunuufOg==}
+
+  '@types/whatwg-url@11.0.5':
+    resolution: {integrity: sha512-coYR071JRaHa+xoEvvYqvnIHaVqaYrLPbsufM9BF63HkwI5Lgmy2QR8Q5K/lYDYo5AK82wOvSOS0UsLTpTG7uQ==}
 
   '@types/ws@7.4.7':
     resolution: {integrity: sha512-JQbbmxZTZehdc2iszGKs5oC3NFnjeay7mtAWrdt7qNtAVK0g19muApzAy4bm9byz79xa2ZnO/BOBC2R8RC5Lww==}
@@ -6600,6 +6652,10 @@ packages:
 
   bser@2.1.1:
     resolution: {integrity: sha512-gQxTNE/GAfIIrmHLUE3oJyp5FO6HRBfhjnw4/wMmA63ZGDJnWBmgY/lyQBpnDUkGmAhbSe39tx2d/iTOAfglwQ==}
+
+  bson@6.10.3:
+    resolution: {integrity: sha512-MTxGsqgYTwfshYWTRdmZRC+M7FnG1b4y7RO7p2k3X24Wq0yv1m77Wsj0BzlPzd/IowgESfsruQCUToa7vbOpPQ==}
+    engines: {node: '>=16.20.1'}
 
   buffer-alloc-unsafe@1.1.0:
     resolution: {integrity: sha512-TEM2iMIEQdJ2yjPJoSIsldnleVaAk1oW3DBVUykyOLsEsFmEc9kn+SFFPz+gl54KQNxlDnAwCXosOS9Okx2xAg==}
@@ -9916,6 +9972,9 @@ packages:
     resolution: {integrity: sha512-DGqD7Hjpi/1or4F/aYAspXKNm5Yili0QDAFAY4QYvpqpgiY6+1jOfqpmByzjxbWd/T9mChbCArXAbDAsTm5oXA==}
     engines: {node: '>=0.12'}
 
+  memory-pager@1.5.0:
+    resolution: {integrity: sha512-ZS4Bp4r/Zoeq6+NLJpP+0Zzm0pR8whtGPf1XExKLJBAczGMnSi3It14OiNCStjQjM6NU1okjQGSxgEZN8eBYKg==}
+
   memory-stream@1.0.0:
     resolution: {integrity: sha512-Wm13VcsPIMdG96dzILfij09PvuS3APtcKNh7M28FsCA/w6+1mjR7hhPmfFNoilX9xU7wTdhsH5lJAm6XNzdtww==}
 
@@ -10215,6 +10274,36 @@ packages:
 
   moment@2.30.1:
     resolution: {integrity: sha512-uEmtNhbDOrWPFS+hdjFCBfy9f2YoyzRpwcl+DqpC6taX21FzsTLQVbMV/W7PzNSX6x/bhC1zA3c2UQ5NzH6how==}
+
+  mongodb-connection-string-url@3.0.2:
+    resolution: {integrity: sha512-rMO7CGo/9BFwyZABcKAWL8UJwH/Kc2x0g72uhDWzG48URRax5TCIcJ7Rc3RZqffZzO/Gwff/jyKwCU9TN8gehA==}
+
+  mongodb@6.13.1:
+    resolution: {integrity: sha512-gdq40tX8StmhP6akMp1pPoEVv+9jTYFSrga/g23JxajPAQhH39ysZrHGzQCSd9PEOnuEQEdjIWqxO7ZSwC0w7Q==}
+    engines: {node: '>=16.20.1'}
+    peerDependencies:
+      '@aws-sdk/credential-providers': ^3.632.0
+      '@mongodb-js/zstd': ^1.1.0 || ^2.0.0
+      gcp-metadata: ^5.2.0
+      kerberos: ^2.0.1
+      mongodb-client-encryption: '>=6.0.0 <7'
+      snappy: ^7.2.2
+      socks: ^2.7.1
+    peerDependenciesMeta:
+      '@aws-sdk/credential-providers':
+        optional: true
+      '@mongodb-js/zstd':
+        optional: true
+      gcp-metadata:
+        optional: true
+      kerberos:
+        optional: true
+      mongodb-client-encryption:
+        optional: true
+      snappy:
+        optional: true
+      socks:
+        optional: true
 
   motion@10.16.2:
     resolution: {integrity: sha512-p+PurYqfUdcJZvtnmAqu5fJgV2kR0uLFQuBKtLeFVTrYEVllI99tiOTSefVNYuip9ELTEkepIIDftNdze76NAQ==}
@@ -12233,6 +12322,9 @@ packages:
 
   space-separated-tokens@2.0.2:
     resolution: {integrity: sha512-PEGlAwrG8yXGXRjW32fGbg66JAlOAwbObuqVoJpv/mRgoWDQfgH1wDPvtzWyUSNAXBGSk8h755YDbbcEy3SH2Q==}
+
+  sparse-bitfield@3.0.3:
+    resolution: {integrity: sha512-kvzhi7vqKTfkh0PZU+2D2PIllw2ymqJKujUcyPMd9Y75Nv4nPbGJZXNhxsgdQab2BmlDct1YnfQCguEvHr7VsQ==}
 
   spdx-correct@3.2.0:
     resolution: {integrity: sha512-kN9dJbvnySHULIluDHy32WHRUu3Og7B9sbY7tsFLctQkIqnMh3hErYgdMjTYuqmcXX+lK5T1lnUt3G7zNswmZA==}
@@ -16430,9 +16522,9 @@ snapshots:
 
   '@coral-xyz/anchor@0.29.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
-      '@coral-xyz/borsh': 0.29.0(@solana/web3.js@1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@coral-xyz/borsh': 0.29.0(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@noble/hashes': 1.7.1
-      '@solana/web3.js': 1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       bn.js: 5.2.1
       bs58: 4.0.1
       buffer-layout: 1.2.2
@@ -16452,9 +16544,9 @@ snapshots:
   '@coral-xyz/anchor@0.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       '@coral-xyz/anchor-errors': 0.30.1
-      '@coral-xyz/borsh': 0.30.1(@solana/web3.js@1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10))
+      '@coral-xyz/borsh': 0.30.1(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@noble/hashes': 1.7.1
-      '@solana/web3.js': 1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       bn.js: 5.2.1
       bs58: 4.0.1
       buffer-layout: 1.2.2
@@ -16495,15 +16587,9 @@ snapshots:
       bn.js: 5.2.1
       buffer-layout: 1.2.2
 
-  '@coral-xyz/borsh@0.29.0(@solana/web3.js@1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
+  '@coral-xyz/borsh@0.29.0(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
-      '@solana/web3.js': 1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      bn.js: 5.2.1
-      buffer-layout: 1.2.2
-
-  '@coral-xyz/borsh@0.30.1(@solana/web3.js@1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
-    dependencies:
-      '@solana/web3.js': 1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       bn.js: 5.2.1
       buffer-layout: 1.2.2
 
@@ -17155,6 +17241,41 @@ snapshots:
     dependencies:
       '@noble/ciphers': 1.2.1
 
+  '@elizaos/adapter-mongodb@0.25.6-alpha.1(@google-cloud/vertexai@1.9.3)(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(@langchain/groq@0.1.3(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(cheerio@1.0.0)(react@18.3.1)(socks@2.8.4)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)':
+    dependencies:
+      '@elizaos/core': 0.25.6-alpha.1(@google-cloud/vertexai@1.9.3)(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(@langchain/groq@0.1.3(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(cheerio@1.0.0)(react@18.3.1)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)
+      mongodb: 6.13.1(socks@2.8.4)
+      uuid: 9.0.1
+    transitivePeerDependencies:
+      - '@aws-sdk/credential-providers'
+      - '@google-cloud/vertexai'
+      - '@langchain/anthropic'
+      - '@langchain/aws'
+      - '@langchain/cohere'
+      - '@langchain/core'
+      - '@langchain/google-genai'
+      - '@langchain/google-vertexai'
+      - '@langchain/groq'
+      - '@langchain/mistralai'
+      - '@langchain/ollama'
+      - '@mongodb-js/zstd'
+      - aws-crt
+      - axios
+      - cheerio
+      - debug
+      - encoding
+      - gcp-metadata
+      - kerberos
+      - mongodb-client-encryption
+      - peggy
+      - react
+      - snappy
+      - socks
+      - supports-color
+      - typeorm
+      - ws
+      - zod
+
   '@elizaos/adapter-postgres@0.1.9(@google-cloud/vertexai@1.9.3)(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(@langchain/groq@0.1.3(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(cheerio@1.0.0)(react@18.3.1)(sswr@2.1.0(svelte@5.20.2))(svelte@5.20.2)(vue@3.5.13(typescript@5.6.3))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@elizaos/core': 0.1.9(@google-cloud/vertexai@1.9.3)(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(@langchain/groq@0.1.3(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(cheerio@1.0.0)(react@18.3.1)(sswr@2.1.0(svelte@5.20.2))(svelte@5.20.2)(vue@3.5.13(typescript@5.6.3))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
@@ -17219,6 +17340,36 @@ snapshots:
       - typeorm
       - vue
       - ws
+
+  '@elizaos/adapter-supabase@0.25.6-alpha.1(@google-cloud/vertexai@1.9.3)(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(@langchain/groq@0.1.3(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(bufferutil@4.0.9)(cheerio@1.0.0)(react@18.3.1)(utf-8-validate@5.0.10)(whatwg-url@14.1.1)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)':
+    dependencies:
+      '@elizaos/core': 0.25.6-alpha.1(@google-cloud/vertexai@1.9.3)(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(@langchain/groq@0.1.3(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(cheerio@1.0.0)(react@18.3.1)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)
+      '@supabase/supabase-js': 2.46.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      whatwg-url: 14.1.1
+    transitivePeerDependencies:
+      - '@google-cloud/vertexai'
+      - '@langchain/anthropic'
+      - '@langchain/aws'
+      - '@langchain/cohere'
+      - '@langchain/core'
+      - '@langchain/google-genai'
+      - '@langchain/google-vertexai'
+      - '@langchain/groq'
+      - '@langchain/mistralai'
+      - '@langchain/ollama'
+      - aws-crt
+      - axios
+      - bufferutil
+      - cheerio
+      - debug
+      - encoding
+      - peggy
+      - react
+      - supports-color
+      - typeorm
+      - utf-8-validate
+      - ws
+      - zod
 
   '@elizaos/client-auto@0.1.9(@google-cloud/vertexai@1.9.3)(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(@langchain/groq@0.1.3(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(cheerio@1.0.0)(react@18.3.1)(sswr@2.1.0(svelte@5.20.2))(svelte@5.20.2)(vue@3.5.13(typescript@5.6.3))(whatwg-url@14.1.1)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
@@ -18516,7 +18667,7 @@ snapshots:
 
   '@ethereumjs/tx@3.3.2':
     dependencies:
-      '@ethereumjs/common': 2.5.0
+      '@ethereumjs/common': 2.6.5
       ethereumjs-util: 7.1.5
 
   '@ethereumjs/tx@3.5.2':
@@ -19630,7 +19781,7 @@ snapshots:
   '@langchain/textsplitters@0.1.0(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))':
     dependencies:
       '@langchain/core': 0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2))
-      js-tiktoken: 1.0.15
+      js-tiktoken: 1.0.19
 
   '@ledgerhq/cryptoassets@6.37.0':
     dependencies:
@@ -20611,6 +20762,10 @@ snapshots:
       raw-body: 3.0.0
       zod: 3.24.2
       zod-to-json-schema: 3.24.2(zod@3.24.2)
+
+  '@mongodb-js/saslprep@1.2.0':
+    dependencies:
+      sparse-bitfield: 3.0.3
 
   '@motionone/animation@10.18.0':
     dependencies:
@@ -22134,8 +22289,8 @@ snapshots:
   '@raydium-io/raydium-sdk-v2@0.1.82-alpha(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)(utf-8-validate@5.0.10)':
     dependencies:
       '@solana/buffer-layout': 4.0.1
-      '@solana/spl-token': 0.4.9(@solana/web3.js@1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)(utf-8-validate@5.0.10)
-      '@solana/web3.js': 1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@solana/spl-token': 0.4.9(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       axios: 1.7.9
       big.js: 6.2.2
       bn.js: 5.2.1
@@ -22830,7 +22985,7 @@ snapshots:
   '@scure/starknet@1.1.0':
     dependencies:
       '@noble/curves': 1.7.0
-      '@noble/hashes': 1.6.0
+      '@noble/hashes': 1.6.1
 
   '@sei-js/core@3.2.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
@@ -23405,7 +23560,7 @@ snapshots:
   '@solana/buffer-layout-utils@0.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       '@solana/buffer-layout': 4.0.1
-      '@solana/web3.js': 1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       bigint-buffer: 1.1.5
       bignumber.js: 9.1.2
     transitivePeerDependencies:
@@ -23636,14 +23791,6 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@solana/spl-token-group@0.0.4(@solana/web3.js@1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10))(fastestsmallesttextencoderdecoder@1.0.22)':
-    dependencies:
-      '@solana/codecs': 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)
-      '@solana/spl-type-length-value': 0.1.0
-      '@solana/web3.js': 1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-    transitivePeerDependencies:
-      - fastestsmallesttextencoderdecoder
-
   '@solana/spl-token-group@0.0.4(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(fastestsmallesttextencoderdecoder@1.0.22)':
     dependencies:
       '@solana/codecs': 2.0.0-preview.2(fastestsmallesttextencoderdecoder@1.0.22)
@@ -23800,21 +23947,6 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - encoding
-      - utf-8-validate
-
-  '@solana/spl-token@0.4.6(@solana/web3.js@1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)(utf-8-validate@5.0.10)':
-    dependencies:
-      '@solana/buffer-layout': 4.0.1
-      '@solana/buffer-layout-utils': 0.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      '@solana/spl-token-group': 0.0.4(@solana/web3.js@1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10))(fastestsmallesttextencoderdecoder@1.0.22)
-      '@solana/spl-token-metadata': 0.1.6(@solana/web3.js@1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10))(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)
-      '@solana/web3.js': 1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      buffer: 6.0.3
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - fastestsmallesttextencoderdecoder
-      - typescript
       - utf-8-validate
 
   '@solana/spl-token@0.4.6(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)(utf-8-validate@5.0.10)':
@@ -24192,6 +24324,48 @@ snapshots:
       - '@gql.tada/svelte-support'
       - '@gql.tada/vue-support'
       - typescript
+
+  '@supabase/auth-js@2.65.1':
+    dependencies:
+      '@supabase/node-fetch': 2.6.15
+
+  '@supabase/functions-js@2.4.3':
+    dependencies:
+      '@supabase/node-fetch': 2.6.15
+
+  '@supabase/node-fetch@2.6.15':
+    dependencies:
+      whatwg-url: 5.0.0
+
+  '@supabase/postgrest-js@1.16.3':
+    dependencies:
+      '@supabase/node-fetch': 2.6.15
+
+  '@supabase/realtime-js@2.10.9(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@supabase/node-fetch': 2.6.15
+      '@types/phoenix': 1.6.6
+      '@types/ws': 8.5.14
+      ws: 8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  '@supabase/storage-js@2.7.1':
+    dependencies:
+      '@supabase/node-fetch': 2.6.15
+
+  '@supabase/supabase-js@2.46.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@supabase/auth-js': 2.65.1
+      '@supabase/functions-js': 2.4.3
+      '@supabase/node-fetch': 2.6.15
+      '@supabase/postgrest-js': 1.16.3
+      '@supabase/realtime-js': 2.10.9(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@supabase/storage-js': 2.7.1
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   '@supercharge/promise-pool@3.2.0': {}
 
@@ -24707,7 +24881,7 @@ snapshots:
 
   '@types/node-fetch@2.6.12':
     dependencies:
-      '@types/node': 18.19.76
+      '@types/node': 22.13.4
       form-data: 4.0.2
 
   '@types/node-forge@1.3.11':
@@ -24751,6 +24925,8 @@ snapshots:
       '@types/node': 22.13.4
       pg-protocol: 1.7.1
       pg-types: 4.0.2
+
+  '@types/phoenix@1.6.6': {}
 
   '@types/promise-retry@1.1.6':
     dependencies:
@@ -24799,11 +24975,17 @@ snapshots:
 
   '@types/webextension-polyfill@0.10.7': {}
 
+  '@types/webidl-conversions@7.0.3': {}
+
   '@types/webrtc@0.0.37': {}
+
+  '@types/whatwg-url@11.0.5':
+    dependencies:
+      '@types/webidl-conversions': 7.0.3
 
   '@types/ws@7.4.7':
     dependencies:
-      '@types/node': 12.20.55
+      '@types/node': 22.13.4
 
   '@types/ws@8.5.14':
     dependencies:
@@ -26668,7 +26850,7 @@ snapshots:
   axios@1.7.4:
     dependencies:
       follow-redirects: 1.15.9(debug@4.3.4)
-      form-data: 4.0.0
+      form-data: 4.0.2
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
@@ -26988,7 +27170,7 @@ snapshots:
 
   borsh@0.6.0:
     dependencies:
-      bn.js: 5.2.0
+      bn.js: 5.2.1
       bs58: 4.0.1
       text-encoding-utf-8: 1.0.2
 
@@ -27125,6 +27307,8 @@ snapshots:
   bser@2.1.1:
     dependencies:
       node-int64: 0.4.0
+
+  bson@6.10.3: {}
 
   buffer-alloc-unsafe@1.1.0: {}
 
@@ -29092,7 +29276,7 @@ snapshots:
 
   extract-zip@2.0.1:
     dependencies:
-      debug: 4.3.4
+      debug: 4.4.0(supports-color@8.1.1)
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
@@ -29344,8 +29528,8 @@ snapshots:
     dependencies:
       '@coral-xyz/anchor': 0.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@raydium-io/raydium-sdk-v2': 0.1.82-alpha(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)(utf-8-validate@5.0.10)
-      '@solana/spl-token': 0.4.9(@solana/web3.js@1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)(utf-8-validate@5.0.10)
-      '@solana/web3.js': 1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@solana/spl-token': 0.4.9(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       bs58: 6.0.0
       coral-xyz3: '@coral-xyz/anchor@0.29.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)'
     transitivePeerDependencies:
@@ -30845,7 +31029,7 @@ snapshots:
       '@langchain/core': 0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2))
       '@langchain/openai': 0.3.17(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@langchain/textsplitters': 0.1.0(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))
-      js-tiktoken: 1.0.15
+      js-tiktoken: 1.0.19
       js-yaml: 4.1.0
       jsonpointer: 5.0.1
       langsmith: 0.2.15(openai@4.73.0(zod@3.23.8))
@@ -30853,8 +31037,8 @@ snapshots:
       p-retry: 4.6.2
       uuid: 10.0.0
       yaml: 2.7.0
-      zod: 3.23.8
-      zod-to-json-schema: 3.24.2(zod@3.23.8)
+      zod: 3.24.2
+      zod-to-json-schema: 3.24.2(zod@3.24.2)
     optionalDependencies:
       '@langchain/groq': 0.1.3(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       axios: 1.7.9
@@ -30870,7 +31054,7 @@ snapshots:
       '@langchain/core': 0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2))
       '@langchain/openai': 0.3.17(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@langchain/textsplitters': 0.1.0(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))
-      js-tiktoken: 1.0.15
+      js-tiktoken: 1.0.19
       js-yaml: 4.1.0
       jsonpointer: 5.0.1
       langsmith: 0.2.15(openai@4.82.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2))
@@ -30878,8 +31062,8 @@ snapshots:
       p-retry: 4.6.2
       uuid: 10.0.0
       yaml: 2.7.0
-      zod: 3.23.8
-      zod-to-json-schema: 3.24.2(zod@3.23.8)
+      zod: 3.24.2
+      zod-to-json-schema: 3.24.2(zod@3.24.2)
     optionalDependencies:
       '@langchain/groq': 0.1.3(@langchain/core@0.3.40(openai@4.85.3(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.2)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       axios: 1.7.9
@@ -31212,6 +31396,8 @@ snapshots:
       lru-queue: 0.1.0
       next-tick: 1.1.0
       timers-ext: 0.1.8
+
+  memory-pager@1.5.0: {}
 
   memory-stream@1.0.0:
     dependencies:
@@ -31625,6 +31811,19 @@ snapshots:
   module-details-from-path@1.0.3: {}
 
   moment@2.30.1: {}
+
+  mongodb-connection-string-url@3.0.2:
+    dependencies:
+      '@types/whatwg-url': 11.0.5
+      whatwg-url: 14.1.1
+
+  mongodb@6.13.1(socks@2.8.4):
+    dependencies:
+      '@mongodb-js/saslprep': 1.2.0
+      bson: 6.10.3
+      mongodb-connection-string-url: 3.0.2
+    optionalDependencies:
+      socks: 2.8.4
 
   motion@10.16.2:
     dependencies:
@@ -32301,8 +32500,8 @@ snapshots:
   ox@0.1.2(typescript@5.6.3)(zod@3.24.2):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
-      '@noble/curves': 1.6.0
-      '@noble/hashes': 1.5.0
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
       '@scure/bip32': 1.5.0
       '@scure/bip39': 1.4.0
       abitype: 1.0.6(typescript@5.6.3)(zod@3.24.2)
@@ -33034,8 +33233,8 @@ snapshots:
     dependencies:
       '@coral-xyz/anchor': 0.30.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@rollup/plugin-json': 6.1.0(rollup@4.34.8)
-      '@solana/spl-token': 0.4.6(@solana/web3.js@1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)(utf-8-validate@5.0.10)
-      '@solana/web3.js': 1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@solana/spl-token': 0.4.6(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -34253,6 +34452,10 @@ snapshots:
       whatwg-url: 7.1.0
 
   space-separated-tokens@2.0.2: {}
+
+  sparse-bitfield@3.0.3:
+    dependencies:
+      memory-pager: 1.5.0
 
   spdx-correct@3.2.0:
     dependencies:
@@ -36224,8 +36427,8 @@ snapshots:
 
   webauthn-p256@0.0.10:
     dependencies:
-      '@noble/curves': 1.6.0
-      '@noble/hashes': 1.5.0
+      '@noble/curves': 1.8.1
+      '@noble/hashes': 1.7.1
 
   webextension-polyfill-ts@0.8.9:
     dependencies:

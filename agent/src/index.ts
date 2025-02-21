@@ -10,10 +10,7 @@ import { bootstrapPlugin } from "@elizaos/plugin-bootstrap";
 import { createNodePlugin } from "@elizaos/plugin-node";
 import { pythDataPlugin } from "@elizaos/plugin-pyth-data";
 import { PocketFinanceSonicPlugin } from "@pocketfinance/sonic-plugin";
-import fs from "fs";
 import net from "net";
-import path from "path";
-import { fileURLToPath } from "url";
 import { initializeDbCache } from "./cache/index.ts";
 import { character } from "./character.ts";
 import { initializeClients } from "./clients/index.ts";
@@ -21,9 +18,6 @@ import {
   getTokenForProvider,
 } from "./config/index.ts";
 import { initializeDatabase } from "./database/index.ts";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export const wait = (minTime: number = 1000, maxTime: number = 3000) => {
   const waitTime =
@@ -75,13 +69,7 @@ async function startAgent(character: Character, directClient: DirectClient) {
     const token = getTokenForProvider(character.modelProvider, character);
     console.log("Starting agent with ID:", character.id);
     
-    const dataDir = path.join(__dirname, "../data");
-
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true });
-    }
-
-    const db = initializeDatabase(dataDir);
+    const db = initializeDatabase();
     await db.init();
 
     const cache = initializeDbCache(character, db);
