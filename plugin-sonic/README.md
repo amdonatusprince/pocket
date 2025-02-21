@@ -1,6 +1,45 @@
-# `@ai16z/plugin-sonic`
+# `@pocketfinance/sonic-plugin`
 
-This plugin enables interaction with the Sonic blockchain ecosystem, providing support for financial analysis and onchain actions on the Sonic network.
+An open-source plugin built on top of the Eliza Agent Framework that enables interaction with the Pocket Finance ecosystem. This plugin provides support for transfers, payments, swaps, staking, bridging, and financial analysis on the Sonic network.
+
+## Mission
+
+PocketFi Plugin aims to make DeFi accessible to everyone by leveraging AI to simplify onchain interactions on the Sonic blockchain. Our goal is to:
+- Make crypto mainstream through intuitive AI interactions
+- Simplify DeFi operations for everyday users
+- Enhance onchain UX through natural language processing
+- Bridge the gap between traditional finance users and Web3
+
+## For Protocol Developers
+
+This plugin is designed to be extensible, allowing any protocol to integrate with the Sonic ecosystem through the Eliza Agent Framework. By using our templates and action patterns, you can:
+
+- Add your protocol's integration
+- Enable AI-powered interactions with your project
+- Let users interact with your protocol through natural language
+- Leverage existing Eliza templates for quick implementation
+
+### Integration Steps
+
+1. Fork this repository
+2. Add your protocol integration using the Eliza agent templates
+3. Follow our existing patterns for actions (see examples in src/actions)
+4. Submit a Pull Request
+5. We'll review and help get your protocol integrated!
+
+Example integration structure:
+```typescript
+// src/actions/your-protocol.ts
+export class YourProtocolAction {
+    // Implementation following Eliza patterns
+}
+
+export const yourProtocolAction: Action = {
+    name: "your-protocol",
+    description: "Interact with YourProtocol on Sonic network",
+    // ... other required fields
+};
+```
 
 ---
 
@@ -8,7 +47,7 @@ This plugin enables interaction with the Sonic blockchain ecosystem, providing s
 
 ### Default Setup
 
-By default, **plugin-sonic** is not enabled. To use it, simply add your private key and/or public key to the `.env` file. If private key is not provided, some actions will be disabled.
+By default, **pocketfi-plugin** is not enabled. To use it, simply add your private key and/or public key to the `.env` file. If private key is not provided, some actions will be disabled.
 
 **Security Note:** Your private key grants full access to your associated funds. Store it securely and never share it with anyone. Do not commit or upload your `.env` file to version control systems like Git.
 
@@ -132,12 +171,26 @@ Get some testnet USDC from the faucet.
 
 ## Contribution
 
+This is an open-source project and we welcome contributions! Whether you're:
+- Adding new protocol integrations
+- Improving existing features
+- Fixing bugs
+- Enhancing documentation
+
 The plugin contains tests. Whether you're using **TDD** or not, please make sure to run the tests before submitting a PR.
 
 ### Running Tests
 
-Navigate to the `plugin-sonic` directory and run:
+Navigate to the `pocketfi-plugin` directory and run:
 
 ```bash
 yarn test
 ```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Built With Eliza
+
+This plugin is proudly built on top of the Eliza Agent Framework, enabling AI-powered interactions with the Sonic blockchain ecosystem. Special thanks to the Eliza team for making this possible.

@@ -323,6 +323,32 @@ Respond with a JSON markdown block containing only the extracted values. Use nul
 }
 \`\`\`
 `;
+var swapTemplate = `Given the recent messages and wallet information below:
+
+{{recentMessages}}
+
+{{walletInfo}}
+
+Extract the following information about the requested token swap:
+- Chain to execute on. Must be one of ["sonic", "sonic-testnet"]. Default is "sonic".
+- Input token symbol or address(string starting with "0x").
+- Output token symbol or address(string starting with "0x").
+- Amount to swap. Must be a string representing the amount in ether (only number without coin symbol, e.g., "0.1").
+- Slippage. Optional, expressed as decimal proportion, 0.03 represents 3%.
+If any field is not provided, use the default value. If no default value is specified, use null.
+
+Respond with a JSON markdown block containing only the extracted values. Use null for any values that cannot be determined:
+
+\`\`\`json
+{
+    "chain": SUPPORTED_CHAINS,
+    "inputToken": string | null,
+    "outputToken": string | null,
+    "amount": string | null,
+    "slippage": number | null
+}
+\`\`\`
+`;
 var stakeTemplate = `Given the recent messages and wallet information below:
 
 {{recentMessages}}
@@ -1531,12 +1557,359 @@ var PocketFiSwapAbi = [
   }
 ];
 
-// src/actions/perplexity.ts
+// src/actions/swap.ts
 import {
   composeContext as composeContext2,
   elizaLogger as elizaLogger3,
   generateObjectDeprecated as generateObjectDeprecated2,
   ModelClass as ModelClass2
+} from "@elizaos/core";
+import {
+  createPublicClient as createPublicClient3,
+  createWalletClient as createWalletClient3,
+  http as http3,
+  formatEther,
+  parseEther as parseEther2,
+  encodeFunctionData,
+  erc20Abi as erc20Abi3
+} from "viem";
+var PocketFiSwapAction = class {
+  constructor(walletProvider) {
+    this.walletProvider = walletProvider;
+  }
+  SWAP_CONTRACT = "0x787b42FA61F11cE130C40D489A00c56a8f5d335f";
+  SUPPORTED_TOKENS = {
+    "POCKET": "0x7a114662911183125B1b5ce893bcA1d59151b5D5",
+    "DIAMOND": "0x30BF3761147Ef0c86E2f84c3784FBD89E7954670",
+    "CORAL": "0xAF93888cbD250300470A1618206e036E11470149"
+  };
+  async swap(params) {
+    elizaLogger3.debug("PocketFi swap params:", params);
+    if (params.chain !== "sonic-testnet") {
+      throw new Error("Only Sonic testnet is supported for swapping");
+    }
+    const account = this.walletProvider.getAccount();
+    elizaLogger3.debug("Using account address:", account.address);
+    elizaLogger3.debug("Using swap contract:", this.SWAP_CONTRACT);
+    const publicClient = createPublicClient3({
+      chain: sonicTestnet,
+      transport: http3(sonicTestnet.rpcUrls.default.http[0])
+    });
+    const walletClient = createWalletClient3({
+      account,
+      chain: sonicTestnet,
+      transport: http3(sonicTestnet.rpcUrls.default.http[0])
+    });
+    try {
+      const tokenAddress = params.action === "swapTokenForNative" ? this.resolveTokenAddress(params.fromToken) : this.resolveTokenAddress(params.toToken);
+      elizaLogger3.debug("Resolved token address:", tokenAddress);
+      const [_, swapRate] = await publicClient.readContract({
+        address: this.SWAP_CONTRACT,
+        abi: PocketFiSwapAbi,
+        functionName: "supportedTokens",
+        args: [tokenAddress]
+      });
+      if (swapRate === 0n) {
+        throw new Error(`Token ${params.toToken} is not supported on PocketSwap`);
+      }
+      const nativeAmount = parseEther2(params.amount);
+      const expectedTokens = nativeAmount * BigInt(1e18) / swapRate;
+      elizaLogger3.debug(`Expected tokens: ${formatEther(expectedTokens)}`);
+      if (params.action === "getRate") {
+        const oneNativeInTokens = BigInt(1e18) * BigInt(1e18) / swapRate;
+        return {
+          chain: params.chain,
+          txHash: "0x0",
+          fromToken: "S",
+          toToken: params.toToken,
+          amount: params.amount,
+          rate: `1 S = ${formatEther(oneNativeInTokens)} ${params.toToken}`
+        };
+      }
+      if (params.action === "swapNativeForToken") {
+        const hash = await walletClient.sendTransaction({
+          account,
+          chain: sonicTestnet,
+          to: this.SWAP_CONTRACT,
+          data: encodeFunctionData({
+            abi: PocketFiSwapAbi,
+            functionName: "swapNativeForToken",
+            args: [tokenAddress]
+          }),
+          value: nativeAmount
+        });
+        await publicClient.waitForTransactionReceipt({ hash });
+        return {
+          chain: params.chain,
+          txHash: hash,
+          fromToken: "S",
+          toToken: params.toToken,
+          amount: params.amount
+        };
+      }
+      if (params.action === "swapTokenForNative") {
+        const approveHash = await walletClient.writeContract({
+          address: tokenAddress,
+          abi: erc20Abi3,
+          functionName: "approve",
+          args: [this.SWAP_CONTRACT, nativeAmount]
+        });
+        await publicClient.waitForTransactionReceipt({ hash: approveHash });
+        const hash = await walletClient.writeContract({
+          address: this.SWAP_CONTRACT,
+          abi: PocketFiSwapAbi,
+          functionName: "swapTokenForNative",
+          args: [tokenAddress, nativeAmount]
+        });
+        await publicClient.waitForTransactionReceipt({ hash });
+        return {
+          chain: params.chain,
+          txHash: hash,
+          fromToken: params.toToken,
+          toToken: "S",
+          amount: params.amount
+        };
+      }
+      throw new Error(`Invalid swap action: ${params.action}`);
+    } catch (error) {
+      elizaLogger3.error("Swap error:", error);
+      throw new Error(`Failed to ${params.action}: ${error.message}`);
+    }
+  }
+  resolveTokenAddress(token) {
+    const upperToken = token.toUpperCase();
+    if (upperToken in this.SUPPORTED_TOKENS) {
+      return this.SUPPORTED_TOKENS[upperToken];
+    }
+    if (token.startsWith("0x")) {
+      return token;
+    }
+    throw new Error(`Token ${token} is not supported`);
+  }
+};
+var pocketFiSwapAction = {
+  name: "pocketfi-swap",
+  description: "Swap tokens using PocketFi Swap on Sonic testnet",
+  handler: async (runtime, message, state, _options, callback) => {
+    if (!state) return false;
+    elizaLogger3.log("Starting PocketFi swap action...");
+    try {
+      const walletProvider = initWalletProvider(runtime);
+      elizaLogger3.debug("Wallet provider initialized");
+      const action = new PocketFiSwapAction(walletProvider);
+      const context = composeContext2({
+        state,
+        template: swapTemplate
+      });
+      const content = await generateObjectDeprecated2({
+        runtime,
+        context,
+        modelClass: ModelClass2.LARGE
+      });
+      const swapResp = await action.swap({
+        chain: "sonic-testnet",
+        action: content.action || "swapNativeForToken",
+        fromToken: content.fromToken || "S",
+        toToken: content.toToken,
+        amount: content.amount
+      });
+      let responseText = swapResp.rate || `Successfully swapped ${swapResp.amount} ${swapResp.fromToken} for ${swapResp.toToken}`;
+      if (swapResp.txHash !== "0x0") {
+        responseText += `
+Transaction Hash: ${swapResp.txHash}`;
+      }
+      callback?.({
+        text: responseText,
+        content: swapResp
+      });
+      return true;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      elizaLogger3.error("Error during PocketFi swap:", errorMessage);
+      callback?.({
+        text: `PocketFi swap failed: ${errorMessage}`,
+        content: { error: errorMessage }
+      });
+      return false;
+    }
+  },
+  examples: [
+    [
+      {
+        user: "{{user1}}",
+        content: {
+          text: "Swap 10 S for CORAL tokens"
+        }
+      },
+      {
+        user: "{{agent}}",
+        content: {
+          text: "I'll help you swap 10 S for CORAL tokens on PocketFi",
+          action: "pocketfi-swap",
+          content: {
+            action: "swapNativeForToken",
+            toToken: "CORAL",
+            amount: "10"
+          }
+        }
+      }
+    ],
+    [
+      {
+        user: "{{user1}}",
+        content: {
+          text: "What's the exchange rate for DIAMOND tokens?"
+        }
+      },
+      {
+        user: "{{agent}}",
+        content: {
+          text: "I'll check the current swap rate for DIAMOND tokens",
+          action: "pocketfi-swap",
+          content: {
+            action: "getRate",
+            toToken: "DIAMOND",
+            amount: "1"
+          }
+        }
+      }
+    ],
+    [
+      {
+        user: "{{user1}}",
+        content: {
+          text: "Swap my POCKET tokens back to S"
+        }
+      },
+      {
+        user: "{{agent}}",
+        content: {
+          text: "I'll help you swap your POCKET tokens back to S",
+          action: "pocketfi-swap",
+          content: {
+            action: "swapTokenForNative",
+            fromToken: "POCKET",
+            toToken: "S",
+            amount: "10"
+          }
+        }
+      }
+    ],
+    [
+      {
+        user: "{{user1}}",
+        content: {
+          text: "Swap 5 DIAMOND for S token"
+        }
+      },
+      {
+        user: "{{agent}}",
+        content: {
+          text: "I'll help you swap 5 DIAMOND tokens for S on PocketFi",
+          action: "pocketfi-swap",
+          content: {
+            action: "swapTokenForNative",
+            fromToken: "DIAMOND",
+            toToken: "S",
+            amount: "5"
+          }
+        }
+      }
+    ],
+    [
+      {
+        user: "{{user1}}",
+        content: {
+          text: "Exchange 2 CORAL to S"
+        }
+      },
+      {
+        user: "{{agent}}",
+        content: {
+          text: "I'll help you exchange 2 CORAL tokens for S on PocketFi",
+          action: "pocketfi-swap",
+          content: {
+            action: "swapTokenForNative",
+            fromToken: "CORAL",
+            toToken: "S",
+            amount: "2"
+          }
+        }
+      }
+    ],
+    [
+      {
+        user: "{{user1}}",
+        content: {
+          text: "I want to swap 1 S token to 0x7a114662911183125B1b5ce893bcA1d59151b5D5 on sonic testnet on pocketSwap"
+        }
+      },
+      {
+        user: "{{agent}}",
+        content: {
+          text: "I'll help you swap 1 S for POCKET tokens (0x7a11...5D5) on PocketFi",
+          action: "pocketfi-swap",
+          content: {
+            action: "swapNativeForToken",
+            toToken: "0x7a114662911183125B1b5ce893bcA1d59151b5D5",
+            amount: "1"
+          }
+        }
+      }
+    ],
+    [
+      {
+        user: "{{user1}}",
+        content: {
+          text: "swap 2 S to token address 0x30BF3761147Ef0c86E2f84c3784FBD89E7954670"
+        }
+      },
+      {
+        user: "{{agent}}",
+        content: {
+          text: "I'll help you swap 2 S for DIAMOND tokens (0x30BF...4670) on PocketFi",
+          action: "pocketfi-swap",
+          content: {
+            action: "swapNativeForToken",
+            toToken: "0x30BF3761147Ef0c86E2f84c3784FBD89E7954670",
+            amount: "2"
+          }
+        }
+      }
+    ]
+  ],
+  similes: [
+    "SWAP",
+    "EXCHANGE",
+    "TRADE",
+    "GET_RATE",
+    "SWAP_RATE",
+    "EXCHANGE_RATE",
+    "CONVERT",
+    "SWAP_TO",
+    "SWAP_FOR",
+    "EXCHANGE_TO",
+    "EXCHANGE_FOR",
+    "TRADE_FOR",
+    "SWAP_TOKEN",
+    "EXCHANGE_TOKEN",
+    "SWAP_ON_POCKETSWAP",
+    "EXCHANGE_ON_POCKETFI",
+    "POCKETFI_SWAP",
+    "POCKETSWAP"
+  ],
+  validate: async (runtime) => {
+    const privateKey = runtime.getSetting("SONIC_PRIVATE_KEY");
+    return typeof privateKey === "string" && privateKey.startsWith("0x");
+  }
+};
+
+// src/actions/perplexity.ts
+import {
+  composeContext as composeContext3,
+  elizaLogger as elizaLogger4,
+  generateObjectDeprecated as generateObjectDeprecated3,
+  ModelClass as ModelClass3
 } from "@elizaos/core";
 var PERPLEXITY_API_URL = "https://api.perplexity.ai/chat/completions";
 var PerplexityAction = class {
@@ -1571,7 +1944,7 @@ var PerplexityAction = class {
         message: result.choices[0].message.content
       };
     } catch (error) {
-      elizaLogger3.error("Perplexity API error:", error);
+      elizaLogger4.error("Perplexity API error:", error);
       return {
         status: "error",
         message: `Failed to get financial analysis: ${error.message}`
@@ -1584,21 +1957,21 @@ var perplexityAction = {
   description: "Get professional financial analysis and advice",
   handler: async (runtime, message, state, options, callback) => {
     if (!state) return false;
-    elizaLogger3.log("Starting financial analysis action...");
+    elizaLogger4.log("Starting financial analysis action...");
     let currentState = state;
     if (!currentState) {
       currentState = await runtime.composeState(message);
     } else {
       currentState = await runtime.updateRecentMessageState(currentState);
     }
-    const context = composeContext2({
+    const context = composeContext3({
       state: currentState,
       template: perplexityTemplate
     });
-    const content = await generateObjectDeprecated2({
+    const content = await generateObjectDeprecated3({
       runtime,
       context,
-      modelClass: ModelClass2.LARGE
+      modelClass: ModelClass3.LARGE
     });
     const action = new PerplexityAction();
     try {
@@ -1609,7 +1982,7 @@ var perplexityAction = {
       });
       return true;
     } catch (error) {
-      elizaLogger3.error("Error during financial analysis:", error.message);
+      elizaLogger4.error("Error during financial analysis:", error.message);
       callback?.({
         text: `Analysis failed: ${error.message}`,
         content: { error: error.message }
@@ -1733,45 +2106,45 @@ var perplexityAction = {
 
 // src/actions/getBalance.ts
 import {
-  composeContext as composeContext3,
-  elizaLogger as elizaLogger4,
-  generateObjectDeprecated as generateObjectDeprecated3,
-  ModelClass as ModelClass3
+  composeContext as composeContext4,
+  elizaLogger as elizaLogger5,
+  generateObjectDeprecated as generateObjectDeprecated4,
+  ModelClass as ModelClass4
 } from "@elizaos/core";
 import {
-  erc20Abi as erc20Abi3,
-  formatEther,
+  erc20Abi as erc20Abi4,
+  formatEther as formatEther2,
   formatUnits as formatUnits3,
-  createPublicClient as createPublicClient3,
-  http as http3
+  createPublicClient as createPublicClient4,
+  http as http4
 } from "viem";
 var GetBalanceAction = class {
   constructor(walletProvider) {
     this.walletProvider = walletProvider;
   }
   async getBalance(params) {
-    elizaLogger4.debug("Get balance params:", params);
+    elizaLogger5.debug("Get balance params:", params);
     if (params.chain !== "sonic" && params.chain !== "sonic-testnet") {
       throw new Error('Unsupported chain. Must be either "sonic" or "sonic-testnet"');
     }
     const chainConfig = params.chain === "sonic" ? sonicMainnet : sonicTestnet;
-    elizaLogger4.debug("Using chain:", chainConfig.name);
+    elizaLogger5.debug("Using chain:", chainConfig.name);
     let address = params.address;
     if (!address) {
       address = this.walletProvider.getAddress();
-      elizaLogger4.debug("Using wallet address:", address);
+      elizaLogger5.debug("Using wallet address:", address);
     }
     if (!address || address === "0x0000000000000000000000000000000000000000") {
-      elizaLogger4.error("Invalid address:", address);
+      elizaLogger5.error("Invalid address:", address);
       throw new Error("Invalid or missing address");
     }
-    const publicClient = createPublicClient3({
+    const publicClient = createPublicClient4({
       chain: chainConfig,
-      transport: http3(chainConfig.rpcUrls.default.http[0])
+      transport: http4(chainConfig.rpcUrls.default.http[0])
     });
     try {
       const formattedAddress = address;
-      elizaLogger4.debug("Querying balance for address:", formattedAddress);
+      elizaLogger5.debug("Querying balance for address:", formattedAddress);
       if (!params.token || params.token.toLowerCase() === chainConfig.nativeCurrency.symbol.toLowerCase()) {
         const nativeBalance = await publicClient.getBalance({
           address: formattedAddress
@@ -1781,7 +2154,7 @@ var GetBalanceAction = class {
           address: formattedAddress,
           balance: {
             token: chainConfig.nativeCurrency.symbol,
-            amount: formatEther(nativeBalance)
+            amount: formatEther2(nativeBalance)
           }
         };
       } else {
@@ -1789,23 +2162,23 @@ var GetBalanceAction = class {
         const [balance, decimals, symbol, name] = await Promise.all([
           publicClient.readContract({
             address: tokenAddress,
-            abi: erc20Abi3,
+            abi: erc20Abi4,
             functionName: "balanceOf",
             args: [formattedAddress]
           }),
           publicClient.readContract({
             address: tokenAddress,
-            abi: erc20Abi3,
+            abi: erc20Abi4,
             functionName: "decimals"
           }),
           publicClient.readContract({
             address: tokenAddress,
-            abi: erc20Abi3,
+            abi: erc20Abi4,
             functionName: "symbol"
           }),
           publicClient.readContract({
             address: tokenAddress,
-            abi: erc20Abi3,
+            abi: erc20Abi4,
             functionName: "name"
           })
         ]);
@@ -1820,7 +2193,7 @@ var GetBalanceAction = class {
         };
       }
     } catch (error) {
-      elizaLogger4.error("Get balance error:", error);
+      elizaLogger5.error("Get balance error:", error);
       throw new Error(`Failed to get balance: ${error.message}`);
     }
   }
@@ -1830,10 +2203,10 @@ var GetBalanceAction = class {
       throw new Error("No wallet address available");
     }
     const chainConfig = chain === "sonic" ? sonicMainnet : sonicTestnet;
-    elizaLogger4.debug("Getting wallet info for chain:", chainConfig.name);
-    const publicClient = createPublicClient3({
+    elizaLogger5.debug("Getting wallet info for chain:", chainConfig.name);
+    const publicClient = createPublicClient4({
       chain: chainConfig,
-      transport: http3(chainConfig.rpcUrls.default.http[0])
+      transport: http4(chainConfig.rpcUrls.default.http[0])
     });
     try {
       const nativeBalance = await publicClient.getBalance({
@@ -1842,10 +2215,10 @@ var GetBalanceAction = class {
       return [
         `Wallet Address: ${address}`,
         `Chain: ${chainConfig.name}`,
-        `Native Balance: ${formatEther(nativeBalance)} ${chainConfig.nativeCurrency.symbol}`
+        `Native Balance: ${formatEther2(nativeBalance)} ${chainConfig.nativeCurrency.symbol}`
       ].join("\n");
     } catch (error) {
-      elizaLogger4.error("Error getting wallet info:", error);
+      elizaLogger5.error("Error getting wallet info:", error);
       throw new Error(`Failed to get wallet info: ${error.message}`);
     }
   }
@@ -1855,24 +2228,24 @@ var getBalanceAction = {
   description: "Get wallet information and token balances on Sonic networks. Supports both native S token and ERC20 tokens.",
   handler: async (runtime, message, state, _options, callback) => {
     if (!state) return false;
-    elizaLogger4.log("Starting getBalance action...");
+    elizaLogger5.log("Starting getBalance action...");
     try {
       const walletProvider = initWalletProvider(runtime);
-      elizaLogger4.debug("Wallet provider initialized");
+      elizaLogger5.debug("Wallet provider initialized");
       const address = walletProvider.getAddress();
       if (!address) {
         throw new Error("No wallet address available");
       }
-      elizaLogger4.debug("Using wallet address:", address);
+      elizaLogger5.debug("Using wallet address:", address);
       const action = new GetBalanceAction(walletProvider);
-      const context = composeContext3({
+      const context = composeContext4({
         state,
         template: getBalanceTemplate
       });
-      const content = await generateObjectDeprecated3({
+      const content = await generateObjectDeprecated4({
         runtime,
         context,
-        modelClass: ModelClass3.LARGE
+        modelClass: ModelClass4.LARGE
       });
       const getBalanceResp = await action.getBalance({
         chain: content.chain || "sonic-testnet",
@@ -1881,7 +2254,7 @@ var getBalanceAction = {
         token: content.token
         // Keep token from content
       });
-      elizaLogger4.debug("Balance response:", getBalanceResp);
+      elizaLogger5.debug("Balance response:", getBalanceResp);
       if (callback) {
         const walletInfo = await action.getWalletInfo(getBalanceResp.chain);
         let text = walletInfo + "\n\n";
@@ -1896,7 +2269,7 @@ var getBalanceAction = {
       }
       return true;
     } catch (error) {
-      elizaLogger4.error("Error during get balance:", error.message);
+      elizaLogger5.error("Error during get balance:", error.message);
       callback?.({
         text: `Get balance failed: ${error.message}`,
         content: { error: error.message }
@@ -1960,19 +2333,19 @@ var getBalanceAction = {
 
 // src/actions/stake.ts
 import {
-  composeContext as composeContext4,
-  elizaLogger as elizaLogger5,
-  generateObjectDeprecated as generateObjectDeprecated4,
-  ModelClass as ModelClass4
+  composeContext as composeContext5,
+  elizaLogger as elizaLogger6,
+  generateObjectDeprecated as generateObjectDeprecated5,
+  ModelClass as ModelClass5
 } from "@elizaos/core";
 import {
-  formatEther as formatEther2,
-  parseEther as parseEther2,
-  encodeFunctionData,
+  formatEther as formatEther3,
+  parseEther as parseEther3,
+  encodeFunctionData as encodeFunctionData2,
   walletActions,
-  createPublicClient as createPublicClient4,
-  createWalletClient as createWalletClient3,
-  http as http4
+  createPublicClient as createPublicClient5,
+  createWalletClient as createWalletClient4,
+  http as http5
 } from "viem";
 var PocketFiStakeAction = class {
   constructor(walletProvider) {
@@ -1980,28 +2353,28 @@ var PocketFiStakeAction = class {
   }
   POCKET_FI_STAKING = "0x404Bf459100f97644d1Fd1dc591eE4A8BC8B5F65";
   async stake(params) {
-    elizaLogger5.debug("PocketFi stake params:", params);
+    elizaLogger6.debug("PocketFi stake params:", params);
     if (params.chain !== "sonic-testnet") {
       throw new Error("Only Sonic testnet is supported for staking");
     }
     const account = this.walletProvider.getAccount();
-    elizaLogger5.debug("Using account address:", account.address);
-    elizaLogger5.debug("Using contract address:", this.POCKET_FI_STAKING);
-    elizaLogger5.debug("Using chain:", sonicTestnet.name);
-    const publicClient = createPublicClient4({
+    elizaLogger6.debug("Using account address:", account.address);
+    elizaLogger6.debug("Using contract address:", this.POCKET_FI_STAKING);
+    elizaLogger6.debug("Using chain:", sonicTestnet.name);
+    const publicClient = createPublicClient5({
       chain: sonicTestnet,
-      transport: http4(sonicTestnet.rpcUrls.default.http[0])
+      transport: http5(sonicTestnet.rpcUrls.default.http[0])
     });
-    const walletClient = createWalletClient3({
+    const walletClient = createWalletClient4({
       account,
       chain: sonicTestnet,
-      transport: http4(sonicTestnet.rpcUrls.default.http[0])
+      transport: http5(sonicTestnet.rpcUrls.default.http[0])
     }).extend(walletActions);
     const balance = await publicClient.getBalance({ address: account.address });
-    elizaLogger5.debug("Account balance:", formatEther2(balance), "S");
+    elizaLogger6.debug("Account balance:", formatEther3(balance), "S");
     try {
       const stakeInfo = await this.getUserStakeInfo(account.address);
-      elizaLogger5.debug("Current stake info:", {
+      elizaLogger6.debug("Current stake info:", {
         stakedAmount: stakeInfo.stakedAmount,
         pendingRewards: stakeInfo.pendingRewards,
         stakeTimestamp: Number(stakeInfo.stakeTimestamp)
@@ -2009,15 +2382,15 @@ var PocketFiStakeAction = class {
       switch (params.action) {
         case "deposit": {
           if (!params.amount) throw new Error("Amount is required for deposit");
-          const value = parseEther2(params.amount);
+          const value = parseEther3(params.amount);
           if (balance < value) {
-            throw new Error(`Insufficient balance. You have ${formatEther2(balance)} S but trying to stake ${params.amount} S`);
+            throw new Error(`Insufficient balance. You have ${formatEther3(balance)} S but trying to stake ${params.amount} S`);
           }
           const hash = await walletClient.sendTransaction({
             account,
             chain: sonicTestnet,
             to: this.POCKET_FI_STAKING,
-            data: encodeFunctionData({
+            data: encodeFunctionData2({
               abi: PocketFiStakingAbi,
               functionName: "stake",
               args: [value]
@@ -2033,15 +2406,15 @@ Transaction Hash: ${hash}`,
         }
         case "withdraw": {
           if (!params.amount) throw new Error("Amount is required for withdraw");
-          const value = parseEther2(params.amount);
-          if (parseEther2(stakeInfo.stakedAmount) < value) {
+          const value = parseEther3(params.amount);
+          if (parseEther3(stakeInfo.stakedAmount) < value) {
             throw new Error(`Insufficient staked balance. You have ${stakeInfo.stakedAmount} sPOCKET but trying to withdraw ${params.amount} S`);
           }
           const hash = await walletClient.sendTransaction({
             account,
             chain: sonicTestnet,
             to: this.POCKET_FI_STAKING,
-            data: encodeFunctionData({
+            data: encodeFunctionData2({
               abi: PocketFiStakingAbi,
               functionName: "withdraw",
               args: [value]
@@ -2057,14 +2430,14 @@ Transaction Hash: ${hash}`,
         }
         case "claim": {
           const earned = await this.getEarned(account.address);
-          if (parseEther2(earned) <= 0n) {
+          if (parseEther3(earned) <= 0n) {
             throw new Error("No rewards available to claim");
           }
           const hash = await walletClient.sendTransaction({
             account,
             chain: sonicTestnet,
             to: this.POCKET_FI_STAKING,
-            data: encodeFunctionData({
+            data: encodeFunctionData2({
               abi: PocketFiStakingAbi,
               functionName: "claimReward"
             })
@@ -2096,27 +2469,27 @@ Stake Time: ${new Date(Number(info.stakeTimestamp) * 1e3).toLocaleString()}`,
           throw new Error(`Invalid action: ${params.action}`);
       }
     } catch (error) {
-      elizaLogger5.error("Stake error:", error);
+      elizaLogger6.error("Stake error:", error);
       throw new Error(`Failed to ${params.action}: ${error.message}`);
     }
   }
   async getEarned(address) {
-    const publicClient = createPublicClient4({
+    const publicClient = createPublicClient5({
       chain: sonicTestnet,
-      transport: http4(sonicTestnet.rpcUrls.default.http[0])
+      transport: http5(sonicTestnet.rpcUrls.default.http[0])
     });
     try {
-      elizaLogger5.debug("Getting earned rewards for address:", address);
+      elizaLogger6.debug("Getting earned rewards for address:", address);
       const earned = await publicClient.readContract({
         address: this.POCKET_FI_STAKING,
         abi: PocketFiStakingAbi,
         functionName: "earned",
         args: [address]
       });
-      elizaLogger5.debug("Raw earned response:", earned);
-      return formatEther2(earned);
+      elizaLogger6.debug("Raw earned response:", earned);
+      return formatEther3(earned);
     } catch (error) {
-      elizaLogger5.error("Error getting earned rewards:", {
+      elizaLogger6.error("Error getting earned rewards:", {
         error: error.message,
         code: error.code,
         details: error.details
@@ -2125,27 +2498,27 @@ Stake Time: ${new Date(Number(info.stakeTimestamp) * 1e3).toLocaleString()}`,
     }
   }
   async getUserStakeInfo(address) {
-    const publicClient = createPublicClient4({
+    const publicClient = createPublicClient5({
       chain: sonicTestnet,
-      transport: http4(sonicTestnet.rpcUrls.default.http[0])
+      transport: http5(sonicTestnet.rpcUrls.default.http[0])
     });
     try {
-      elizaLogger5.debug("Getting stake info for address:", address);
+      elizaLogger6.debug("Getting stake info for address:", address);
       const info = await publicClient.readContract({
         address: this.POCKET_FI_STAKING,
         abi: PocketFiStakingAbi,
         functionName: "getUserStakeInfo",
         args: [address]
       });
-      elizaLogger5.debug("Raw stake info response:", info);
+      elizaLogger6.debug("Raw stake info response:", info);
       return {
-        stakedAmount: formatEther2(info[0]),
-        pendingRewards: formatEther2(info[1]),
+        stakedAmount: formatEther3(info[0]),
+        pendingRewards: formatEther3(info[1]),
         stakeTimestamp: info[2],
         lastRewardTime: info[3]
       };
     } catch (error) {
-      elizaLogger5.error("Error getting stake info:", {
+      elizaLogger6.error("Error getting stake info:", {
         error: error.message,
         code: error.code,
         details: error.details
@@ -2158,12 +2531,12 @@ Stake Time: ${new Date(Number(info.stakeTimestamp) * 1e3).toLocaleString()}`,
     if (!address) {
       throw new Error("No wallet address available");
     }
-    const publicClient = createPublicClient4({
+    const publicClient = createPublicClient5({
       chain: sonicTestnet,
-      transport: http4(sonicTestnet.rpcUrls.default.http[0])
+      transport: http5(sonicTestnet.rpcUrls.default.http[0])
     });
     try {
-      elizaLogger5.debug("Getting wallet info for address:", address);
+      elizaLogger6.debug("Getting wallet info for address:", address);
       const [nativeBalance, stakeInfo, apr] = await Promise.all([
         publicClient.getBalance({ address }),
         this.getUserStakeInfo(address),
@@ -2173,22 +2546,22 @@ Stake Time: ${new Date(Number(info.stakeTimestamp) * 1e3).toLocaleString()}`,
           functionName: "getAPR"
         })
       ]);
-      elizaLogger5.debug("Wallet info response:", {
-        balance: formatEther2(nativeBalance),
+      elizaLogger6.debug("Wallet info response:", {
+        balance: formatEther3(nativeBalance),
         stakeInfo,
         apr: Number(apr) / 100
       });
       return [
         `Wallet Address: ${address}`,
         `Chain: ${sonicTestnet.name}`,
-        `Native Balance: ${formatEther2(nativeBalance)} ${sonicTestnet.nativeCurrency.symbol}`,
+        `Native Balance: ${formatEther3(nativeBalance)} ${sonicTestnet.nativeCurrency.symbol}`,
         `Staked Amount: ${stakeInfo.stakedAmount} sPOCKET`,
         `Pending Rewards: ${stakeInfo.pendingRewards} S`,
         `Current APR: ${Number(apr) / 100}%`,
         `Stake Time: ${new Date(Number(stakeInfo.stakeTimestamp) * 1e3).toLocaleString()}`
       ].join("\n");
     } catch (error) {
-      elizaLogger5.error("Error getting wallet info:", {
+      elizaLogger6.error("Error getting wallet info:", {
         error: error.message,
         code: error.code,
         details: error.details
@@ -2202,21 +2575,21 @@ var pocketFiStakeAction = {
   description: "Stake, unstake, and claim rewards through PocketFi Staking on Sonic network",
   handler: async (runtime, message, state, _options, callback) => {
     if (!state) return false;
-    elizaLogger5.log("Starting PocketFi stake action...");
+    elizaLogger6.log("Starting PocketFi stake action...");
     try {
       const walletProvider = initWalletProvider(runtime);
-      elizaLogger5.debug("Wallet provider initialized");
-      elizaLogger5.debug("Wallet address:", walletProvider.getAddress());
-      elizaLogger5.debug("Chain:", sonicTestnet.name);
+      elizaLogger6.debug("Wallet provider initialized");
+      elizaLogger6.debug("Wallet address:", walletProvider.getAddress());
+      elizaLogger6.debug("Chain:", sonicTestnet.name);
       const action = new PocketFiStakeAction(walletProvider);
-      const context = composeContext4({
+      const context = composeContext5({
         state,
         template: stakeTemplate
       });
-      const content = await generateObjectDeprecated4({
+      const content = await generateObjectDeprecated5({
         runtime,
         context,
-        modelClass: ModelClass4.LARGE
+        modelClass: ModelClass5.LARGE
       });
       const stakeResp = await action.stake({
         chain: "sonic-testnet",
@@ -2236,7 +2609,7 @@ ${walletInfo}`,
       return true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      elizaLogger5.error("Error during PocketFi stake:", errorMessage);
+      elizaLogger6.error("Error during PocketFi stake:", errorMessage);
       callback?.({
         text: `PocketFi stake failed: ${errorMessage}`,
         content: { error: errorMessage }
@@ -2347,16 +2720,16 @@ ${walletInfo}`,
 
 // src/actions/deploy.ts
 import {
-  composeContext as composeContext5,
-  elizaLogger as elizaLogger7,
-  generateObjectDeprecated as generateObjectDeprecated5,
-  ModelClass as ModelClass5
+  composeContext as composeContext6,
+  elizaLogger as elizaLogger8,
+  generateObjectDeprecated as generateObjectDeprecated6,
+  ModelClass as ModelClass6
 } from "@elizaos/core";
 import solc2 from "solc";
 import { parseUnits as parseUnits2 } from "viem";
 
 // src/utils/contracts.ts
-import { elizaLogger as elizaLogger6 } from "@elizaos/core";
+import { elizaLogger as elizaLogger7 } from "@elizaos/core";
 import solc from "solc";
 function findImports(importPath) {
   const sources = {
@@ -2612,7 +2985,7 @@ async function compileSolidity(contractName) {
         }
       }
     };
-    elizaLogger6.debug(`Compiling ${contractName}...`);
+    elizaLogger7.debug(`Compiling ${contractName}...`);
     const output = JSON.parse(solc.compile(JSON.stringify(input), { import: findImports }));
     if (output.errors) {
       const errors = output.errors.filter((e) => e.severity === "error");
@@ -2621,7 +2994,7 @@ async function compileSolidity(contractName) {
       }
       output.errors.forEach((e) => {
         if (e.severity === "warning") {
-          elizaLogger6.warn(`Compilation warning: ${e.message}`);
+          elizaLogger7.warn(`Compilation warning: ${e.message}`);
         }
       });
     }
@@ -2634,7 +3007,7 @@ async function compileSolidity(contractName) {
       bytecode: contract.evm.bytecode.object
     };
   } catch (error) {
-    elizaLogger6.error("Compilation failed:", error.message);
+    elizaLogger7.error("Compilation failed:", error.message);
     throw error;
   }
 }
@@ -2661,30 +3034,30 @@ var DeployAction = class {
         }
       }
     };
-    elizaLogger7.debug("Compiling contract...");
+    elizaLogger8.debug("Compiling contract...");
     const output = JSON.parse(solc2.compile(JSON.stringify(input)));
     if (output.errors) {
       const hasError = output.errors.some(
         (error) => error.type === "Error"
       );
       if (hasError) {
-        elizaLogger7.error(
+        elizaLogger8.error(
           `Compilation errors: ${JSON.stringify(output.errors, null, 2)}`
         );
       }
     }
     const contract = output.contracts[solName][contractName];
     if (!contract) {
-      elizaLogger7.error("Compilation result is empty");
+      elizaLogger8.error("Compilation result is empty");
     }
-    elizaLogger7.debug("Contract compiled successfully");
+    elizaLogger8.debug("Contract compiled successfully");
     return {
       abi: contract.abi,
       bytecode: contract.evm.bytecode.object
     };
   }
   async deployERC20(deployTokenParams) {
-    elizaLogger7.debug("deployTokenParams", deployTokenParams);
+    elizaLogger8.debug("deployTokenParams", deployTokenParams);
     const { name, symbol, decimals, totalSupply, chain } = deployTokenParams;
     if (!name || name === "") {
       throw new Error("Token name is required");
@@ -2711,12 +3084,12 @@ var DeployAction = class {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      elizaLogger7.error("Deploy ERC20 failed:", errorMessage);
+      elizaLogger8.error("Deploy ERC20 failed:", errorMessage);
       throw error;
     }
   }
   async deployERC721(deployNftParams) {
-    elizaLogger7.debug("deployNftParams", deployNftParams);
+    elizaLogger8.debug("deployNftParams", deployNftParams);
     const { baseURI, name, symbol, chain } = deployNftParams;
     if (!name || name === "") {
       throw new Error("Token name is required");
@@ -2739,12 +3112,12 @@ var DeployAction = class {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      elizaLogger7.error("Deploy ERC721 failed:", errorMessage);
+      elizaLogger8.error("Deploy ERC721 failed:", errorMessage);
       throw error;
     }
   }
   async deployERC1155(deploy1155Params) {
-    elizaLogger7.debug("deploy1155Params", deploy1155Params);
+    elizaLogger8.debug("deploy1155Params", deploy1155Params);
     const { baseURI, name, chain } = deploy1155Params;
     if (!name || name === "") {
       throw new Error("Token name is required");
@@ -2763,7 +3136,7 @@ var DeployAction = class {
         address: contractAddress
       };
     } catch (error) {
-      elizaLogger7.error("Deploy ERC1155 failed:", error instanceof Error ? error.message : String(error));
+      elizaLogger8.error("Deploy ERC1155 failed:", error instanceof Error ? error.message : String(error));
       throw error;
     }
   }
@@ -2775,7 +3148,7 @@ var DeployAction = class {
         "ERC1155Contract": "Erc1155Contract"
       };
       const mappedName = contractMap[contractName] || contractName;
-      elizaLogger7.debug(`Compiling contract: ${mappedName}`);
+      elizaLogger8.debug(`Compiling contract: ${mappedName}`);
       const { abi, bytecode } = await compileSolidity(mappedName);
       if (!bytecode) {
         throw new Error("Bytecode is empty after compilation");
@@ -2790,15 +3163,15 @@ var DeployAction = class {
         args,
         chain: chainConfig
       });
-      elizaLogger7.debug("Waiting for deployment transaction...", hash);
+      elizaLogger8.debug("Waiting for deployment transaction...", hash);
       const publicClient = this.walletProvider.getPublicClient(chain);
       const receipt = await publicClient.waitForTransactionReceipt({
         hash
       });
-      elizaLogger7.debug("Contract deployed successfully!");
+      elizaLogger8.debug("Contract deployed successfully!");
       return receipt.contractAddress;
     } catch (error) {
-      elizaLogger7.error(`Failed to deploy contract:`, error);
+      elizaLogger8.error(`Failed to deploy contract:`, error);
       throw error;
     }
   }
@@ -2808,7 +3181,7 @@ var deployAction = {
   description: "Deploy token contracts (ERC20/721/1155) based on user specifications",
   handler: async (runtime, message, state, options, callback) => {
     if (!state) return false;
-    elizaLogger7.log("Starting deploy action...");
+    elizaLogger8.log("Starting deploy action...");
     try {
       let currentState = state;
       if (!currentState) {
@@ -2817,14 +3190,14 @@ var deployAction = {
         currentState = await runtime.updateRecentMessageState(currentState);
       }
       state.walletInfo = await sonicWalletProvider.get(runtime, message, currentState);
-      const context = composeContext5({
+      const context = composeContext6({
         state: currentState,
         template: ercContractTemplate
       });
-      const content = await generateObjectDeprecated5({
+      const content = await generateObjectDeprecated6({
         runtime,
         context,
-        modelClass: ModelClass5.LARGE
+        modelClass: ModelClass6.LARGE
       });
       const walletProvider = initWalletProvider(runtime);
       const action = new DeployAction(walletProvider);
@@ -2870,7 +3243,7 @@ var deployAction = {
       return true;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-      elizaLogger7.error("Error during deploy:", errorMessage);
+      elizaLogger8.error("Error during deploy:", errorMessage);
       callback?.({
         text: `Deploy failed: ${errorMessage}`,
         content: { error: errorMessage }
@@ -2929,8 +3302,8 @@ var PocketFinanceSonicPlugin = {
   services: [],
   actions: [
     getBalanceAction,
+    pocketFiSwapAction,
     transferAction,
-    // swapAction,
     perplexityAction,
     pocketFiStakeAction,
     deployAction

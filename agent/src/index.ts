@@ -9,7 +9,7 @@ import {
 import { bootstrapPlugin } from "@elizaos/plugin-bootstrap";
 import { createNodePlugin } from "@elizaos/plugin-node";
 import { pythDataPlugin } from "@elizaos/plugin-pyth-data";
-import { PocketFinanceSonicPlugin } from "@elizaos/plugin-sonic";
+import { PocketFinanceSonicPlugin } from "@pocketfinance/sonic-plugin";
 import fs from "fs";
 import net from "net";
 import path from "path";
