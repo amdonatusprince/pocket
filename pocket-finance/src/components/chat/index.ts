@@ -26,7 +26,7 @@ async function handleUserInput(input: string, agentId: string) {
   }
 
   try {
-    let serverPort = parseInt(settings.SERVER_PORT || "3000");
+    const serverPort = parseInt(settings.SERVER_PORT || "3000");
     // Try both ports if the first attempt fails
     const tryPort = async (port: number) => {
       const response = await fetch(
