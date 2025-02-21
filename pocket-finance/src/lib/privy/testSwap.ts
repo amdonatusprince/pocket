@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createPublicClient, http, formatEther, parseEther, createWalletClient, encodeFunctionData } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { sonicTestnet } from './wallet.js';

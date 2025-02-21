@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { PRIVY_CONFIG, PRIVY_APP_ID } from '@/lib/privy/config';

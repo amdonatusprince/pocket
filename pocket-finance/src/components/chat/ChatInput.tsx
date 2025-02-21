@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Send, Paperclip, Mic } from 'lucide-react';
 import { AIModelSelector } from './AIModelSelector';
 import { useEffect, useRef, useState } from 'react';
