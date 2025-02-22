@@ -26,36 +26,23 @@ async function handleUserInput(input: string, agentId: string) {
   }
 
   try {
-    const serverPort = parseInt(settings.SERVER_PORT || "3000");
-    // Try both ports if the first attempt fails
-    const tryPort = async (port: number) => {
-      const response = await fetch(
-        `http://localhost:${port}/${agentId}/message`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            text: input,
-            userId: "user",
-            userName: "User",
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`Server error: ${text}`);
+    const serverUrl = "https://pocket-server-ot0l.onrender.com";
+    const response = await fetch(
+      `${serverUrl}/${agentId}/message`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: input,
+          userId: "user",
+          userName: "User",
+        }),
       }
+    );
 
-      return response;
-    };
-
-    let response;
-    try {
-      response = await tryPort(serverPort);
-    } catch (error) {
-      // If first port fails, try the next port
-      response = await tryPort(serverPort + 1);
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(`Server error: ${text}`);
     }
 
     const data = await response.json();

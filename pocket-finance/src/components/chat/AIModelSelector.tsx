@@ -5,7 +5,7 @@ export const AI_MODELS = [
   { 
     id: 'gpt4', 
     name: 'Open AI',
-    icon: '/openAi_icon.svg'
+    icon: '/openAI_icon.svg'
   },
   { 
     id: 'claude', 

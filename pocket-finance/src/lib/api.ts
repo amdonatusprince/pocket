@@ -1,6 +1,6 @@
 import type { UUID, Character } from "@elizaos/core";
 
-const BASE_URL = `http://localhost:3001`;
+const BASE_URL = `https://pocket-server-ot0l.onrender.com`;
 
 const fetcher = async ({
     url,
