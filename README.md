@@ -191,7 +191,7 @@ The **PocketFi Sonic Plugin** offers various on-chain actions that users can per
 
    **Example usage**:
    ```bash
-   Bridge 100 SONIC from Ethereum to Sonic network.
+   Swap 100 SONIC for POCKET tokens on the Sonic Testnet.
    ```
 
 ### 7. **Stake**:
