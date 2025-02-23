@@ -71,6 +71,8 @@ Pocket Finance also supports **Allora** and **Pyth Data**, unlocking even more p
 
 ---
 
+![Pocket Finance Homepage](https://github.com/amdonatusprince/pocket/blob/main/pocket-finance/public/dashboard.png)
+
 ## Features of Pocket Finance
 
 Pocket Finance automatically provides several features and functionalities, making decentralized finance (DeFi) and payments more accessible and user-friendly:
