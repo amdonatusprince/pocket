@@ -10,7 +10,9 @@ The Gateway to Simplified DeFi and Payment Services.
 </p>
 
 ## Useful Resources
-Demo Video: https://youtu.be/uu7GbqnAtQQ
+Demo Video: https://youtu.be/b2_ehd_iXck
+
+Pitch Video: https://youtu.be/xcbTGLkU0Qw
 
 Website URL: https://pocketfi.vercel.app
 
